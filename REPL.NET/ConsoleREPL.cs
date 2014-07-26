@@ -318,6 +318,27 @@ namespace REPL.NET
             return false; // Command isn't in list
         }
         /// <summary>
+        /// Checks if a command exists
+        /// </summary>
+        /// <param name="c">Command to check</param>
+        /// <returns>True if command is registered</returns>
+        public bool CommandExists(REPLCommand c)
+        {
+            return commands.Contains(c);
+        }
+        /// <summary>
+        /// Checks if a command exists
+        /// </summary>
+        /// <param name="s">Command to check</param>
+        /// <returns>True if command is registered</returns>
+        public bool CommandExists(string s)
+        {
+            foreach (REPLCommand c in commands)
+                if (c.Name == s)
+                    return true;
+            return false;
+        }
+        /// <summary>
         /// Shows help from the given arguments
         /// </summary>
         /// <param name="e">Loop args</param>
