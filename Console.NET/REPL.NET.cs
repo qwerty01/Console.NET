@@ -149,7 +149,7 @@ namespace Console.NET
             window.AddCommand("exit", "", "Exits the window", CmdExit); // Add exit to the commands
             window.AddCommand("quit", "", "Exits the window", CmdExit); // Add quit to the commands
             window.AddCommand("window", "[window]", "Switches to a different window", CmdWindow); // Add window to the commands
-            return ConsoleREPL.AddWindow(window) ? "Added window!" : "Adding window failed"; // Add the window and return the result
+            return ConsoleREPL.AddWindow(window) != -1 ? "Added window!" : "Adding window failed"; // Add the window and return the result
         }
     }
 }

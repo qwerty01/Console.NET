@@ -56,6 +56,10 @@ namespace REPL.NET
         /// </summary>
         public string[] Arguments { get; protected set; }
         /// <summary>
+        /// Contains the full command
+        /// </summary>
+        public string FullCommand { get; protected set; }
+        /// <summary>
         /// Constructs new event args
         /// </summary>
         /// <param name="cont">Initial state of continue condition (default: true)</param>
@@ -68,8 +72,18 @@ namespace REPL.NET
         /// <summary>
         /// Creates an array from command-line style args
         /// </summary>
-        /// <param name="args">entire argument string</param>
+        /// <param name="args">Entire argument string</param>
         public void SetArguments(string args)
+        {
+            FullCommand = args;
+            Arguments = GetArguments(args);
+        }
+        /// <summary>
+        /// Returns an array from command-line style args
+        /// </summary>
+        /// <param name="args">Entire argument string</param>
+        /// <returns>Argument array</returns>
+        public static string[] GetArguments(string args)
         {
             List<string> cmdArgs = new List<string>(); // List of arguments
             string curr = ""; // Current argument
@@ -83,8 +97,7 @@ namespace REPL.NET
                 // Nope, set arguments to empty
                 cmdArgs.Add("");
                 cmdArgs.Add("");
-                Arguments = cmdArgs.ToArray();
-                return;
+                return cmdArgs.ToArray();
             }
 
             // Loop through the arguments
@@ -110,7 +123,7 @@ namespace REPL.NET
             cmdArgs.Add(curr); // Add the last command to the list
             cmdArgs.RemoveAll(x => x == ""); // Remove all empty arguments
             cmdArgs.Insert(0, arguments); // Add in the full argument string to args[0]
-            Arguments = cmdArgs.ToArray(); // Convert the arguments to an array
+            return cmdArgs.ToArray(); // Convert the arguments to an array
         }
     }
 }

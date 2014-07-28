@@ -126,20 +126,22 @@ namespace REPL.NET
             while (windowList.Count > 0) // While eval says to continue and the window list isn't empty
             {
                 e.Continue = true;
-                ConsoleREPL active = CurrentWindow; // Current active window (if window is switched in eval, print will not be handled properly if "CurrentWindow" is used)
-                if (active.clearRequired)
+                //ConsoleREPL active = CurrentWindow; // Current active window (if window is switched in eval, print will not be handled properly if "CurrentWindow" is used)
+                if (CurrentWindow.clearRequired)
                     Console.Clear();
-                active.clearRequired = false;
-                active.Read(e); // Read using the current window
-                if (!active.ParseEmptyCommand && e.Arguments[1] == "") // Ignore empty commands if specified
+                CurrentWindow.clearRequired = false;
+                CurrentWindow.Read(e); // Read using the current window
+                if (!CurrentWindow.ParseEmptyCommand && e.Arguments[1] == "") // Ignore empty commands if specified
                     continue;
-                active.Print(
-                    active.Eval(e) // Evaluate the input
+                CurrentWindow.Print(
+                    CurrentWindow.Eval(e) // Evaluate the input
                     ); // Print the results from eval
                 if (!e.Continue)
                 {
-                    RemoveWindow(active);
+                    RemoveWindow(CurrentWindow);
                     Console.Clear();
+                    if(windowList.Count != 0)
+                        Console.WriteLine("Exited Window\nCurrent: "+CurrentWindow.WindowName);
                 }
             }
         }
@@ -163,9 +165,8 @@ namespace REPL.NET
         {
             if (windowNum < 0) return false; // windowNum is too small
             if (windowNum >= windowList.Count) return false; // windowNum is too large
-            CurrentWindow.clearRequired = true; // Clear the old window
+            Console.Clear();
             WindowId = windowNum; // windowNum is just right
-            CurrentWindow.clearRequired = true; // clear the new window
             return true;
         }
         /// <summary>
@@ -173,12 +174,12 @@ namespace REPL.NET
         /// </summary>
         /// <param name="window">Window to add</param>
         /// <returns>True if adding was successful</returns>
-        public static bool AddWindow(ConsoleREPL window)
+        public static int AddWindow(ConsoleREPL window)
         {
             if (windowList.Any(w => w.WindowName == window.WindowName))
-                return false;
+                return -1;
             windowList.Add(window); // Add the window
-            return true;
+            return windowList.IndexOf(window);
         }
         /// <summary>
         /// Removes a window from the list
@@ -224,7 +225,7 @@ namespace REPL.NET
         /// <param name="caseSensitiveCmd">Whether or not commands are case sensitive</param>
         /// <param name="parseEmptyCommand">Whether or not to handle commands that are empty</param>
         /// <param name="handleHelp">Whether or not to handle help</param>
-        public ConsoleREPL(LoopDelegate eval, string windowName = "", string prompt = "> ", bool caseSensitiveCmd = false, bool parseEmptyCommand = false, bool handleHelp = true)
+        public ConsoleREPL(LoopDelegate eval, string windowName, string prompt = "> ", bool caseSensitiveCmd = false, bool parseEmptyCommand = false, bool handleHelp = true)
         {
             ReadPrompt = prompt;
             RunEval = eval;
@@ -261,7 +262,7 @@ namespace REPL.NET
                     foreach (REPLCommand c in commands) // Check which command was called
                         if ((CaseSensitiveCmd ? e.Arguments[1] : e.Arguments[1].ToLower()) == (CaseSensitiveCmd ? c.Name : c.Name.ToLower())) // If it's the current command
                         {
-                            CommandEventArgs ee = new CommandEventArgs(e.Arguments); // create the arguments
+                            CommandEventArgs ee = new CommandEventArgs(e.Arguments, e.FullCommand); // create the arguments
                             ret = c.Callback(this, ee); // Call the command
                             e.Continue = !ee.Quit; // Exit if function says so
                             return ret; // print the function
@@ -361,7 +362,7 @@ namespace REPL.NET
                 if (c.Name == e.Arguments[2]) // Check if the help request is the current command
                 {
                     ret = "Usage: " + e.Arguments[2] + " " + c.Usage + "\nDescription: " + c.Description + "\n"; // Display usage and description
-                    CommandEventArgs ee = new CommandEventArgs(e.Arguments, true); // Setup command args
+                    CommandEventArgs ee = new CommandEventArgs(e.Arguments, e.FullCommand, true); // Setup command args
                     ret += c.Callback(this, ee); // Call the function in case it wants to add anything to the help text
                     e.Continue = !ee.Quit; // Exit if the function says so (would be kinda strange for a help call)
                     return ret;

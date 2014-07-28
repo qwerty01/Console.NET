@@ -38,16 +38,22 @@ namespace REPL.NET
         /// </summary>
         public string[] Arguments { get; protected set; }
         /// <summary>
+        /// Contains the full command
+        /// </summary>
+        public string FullCommand { get; protected set; }
+        /// <summary>
         /// Creates a new command event arg
         /// </summary>
         /// <param name="args">Command line argument list</param>
+        /// <param name="fullCommand">Full console command</param>
         /// <param name="help">Whether or not function was called from help</param>
         /// <param name="quit">True if the window should exit</param>
-        public CommandEventArgs(string[] args, bool help = false, bool quit = false)
+        public CommandEventArgs(string[] args, string fullCommand, bool help = false, bool quit = false)
         {
             Quit = quit;
             Help = help;
             Arguments = args; // should this be deep copied?
+            FullCommand = fullCommand;
         }
     }
 }
