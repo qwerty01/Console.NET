@@ -28,13 +28,16 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace Console.NET
+namespace InteractiveConsole
 {
-    class Program
+    public class InputEventArgs : EventArgs
     {
-        static void Main(string[] args)
+        public string Input { get; protected set; }
+        public bool Continue { get; protected set; }
+        public InputEventArgs(string input)
         {
-            InteractiveConsole.Main();
+            Input = input;
+            Continue = true;
         }
     }
 }

@@ -27,14 +27,14 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading.Tasks;
 
-namespace Console.NET
+namespace InteractiveConsole
 {
-    class Program
+    class MenuSeparater : MenuItem
     {
-        static void Main(string[] args)
-        {
-            InteractiveConsole.Main();
-        }
+        public MenuSeparater(InterCon parent )
+            : base(parent, "----------", new ConsoleKeyInfo())
+        { }
     }
 }

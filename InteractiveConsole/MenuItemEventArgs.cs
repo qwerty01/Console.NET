@@ -27,14 +27,17 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading.Tasks;
 
-namespace Console.NET
+namespace InteractiveConsole
 {
-    class Program
+    class MenuItemEventArgs : EventArgs
     {
-        static void Main(string[] args)
+        public object State { get; set; }
+        public MenuItemEventArgs(object state)
+            : base()
         {
-            InteractiveConsole.Main();
+            State = state;
         }
     }
 }

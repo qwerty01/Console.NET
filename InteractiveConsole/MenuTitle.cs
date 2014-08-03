@@ -25,16 +25,20 @@
 #endregion
 using System;
 using System.Collections.Generic;
+using System.Drawing;
 using System.Linq;
-using System.Text;
+using System.Threading.Tasks;
 
-namespace Console.NET
+namespace InteractiveConsole
 {
-    class Program
+    class MenuTitle : MenuItem
     {
-        static void Main(string[] args)
+        public List<MenuItem> Items;
+
+        public MenuTitle(InterCon parent, string text, ConsoleKeyInfo hotkey = new ConsoleKeyInfo())
+            : base(parent, text, hotkey)
         {
-            InteractiveConsole.Main();
+            Items = new List<MenuItem>();
         }
     }
 }

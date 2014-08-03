@@ -95,6 +95,10 @@ namespace REPL.NET
         /// Window name
         /// </summary>
         public string WindowName { get; set; }
+        /// <summary>
+        /// When true (default), uses exception handling to prevent a command from crashing the console
+        /// </summary>
+        public bool SafeRun { get; set; }
         
         //Private Variables
         /// <summary>
@@ -225,7 +229,7 @@ namespace REPL.NET
         /// <param name="caseSensitiveCmd">Whether or not commands are case sensitive</param>
         /// <param name="parseEmptyCommand">Whether or not to handle commands that are empty</param>
         /// <param name="handleHelp">Whether or not to handle help</param>
-        public ConsoleREPL(LoopDelegate eval, string windowName, string prompt = "> ", bool caseSensitiveCmd = false, bool parseEmptyCommand = false, bool handleHelp = true)
+        public ConsoleREPL(LoopDelegate eval, string windowName, bool safeRun = true, string prompt = "> ", bool caseSensitiveCmd = false, bool parseEmptyCommand = false, bool handleHelp = true)
         {
             ReadPrompt = prompt;
             RunEval = eval;
@@ -234,6 +238,7 @@ namespace REPL.NET
             ParseEmptyCommand = parseEmptyCommand;
             HandleHelp = handleHelp;
             WindowName = windowName;
+            SafeRun = safeRun;
         }
 
         /// <summary>
@@ -254,19 +259,46 @@ namespace REPL.NET
         public string Eval(LoopEventArgs e)
         {
             e.Parse = true; // Reset parse
-            string ret = RunEval(this, e); // Run user-defined eval
-            if (e.Parse) // Check if they want us to handle anything
-                if (HandleHelp && e.Arguments[1] == "help") // Handle help
-                    return ShowHelp(e);
-                else
-                    foreach (REPLCommand c in commands) // Check which command was called
-                        if ((CaseSensitiveCmd ? e.Arguments[1] : e.Arguments[1].ToLower()) == (CaseSensitiveCmd ? c.Name : c.Name.ToLower())) // If it's the current command
-                        {
-                            CommandEventArgs ee = new CommandEventArgs(e.Arguments, e.FullCommand); // create the arguments
-                            ret = c.Callback(this, ee); // Call the command
-                            e.Continue = !ee.Quit; // Exit if function says so
-                            return ret; // print the function
-                        }
+            string ret;
+            if (SafeRun)
+            {
+                try
+                {
+                    ret = RunEval(this, e); // Run user-defined eval
+                    if (e.Parse) // Check if they want us to handle anything
+                        if (HandleHelp && e.Arguments[1] == "help") // Handle help
+                            return ShowHelp(e);
+                        else
+                            foreach (REPLCommand c in commands) // Check which command was called
+                                if ((CaseSensitiveCmd ? e.Arguments[1] : e.Arguments[1].ToLower()) == (CaseSensitiveCmd ? c.Name : c.Name.ToLower())) // If it's the current command
+                                {
+                                    CommandEventArgs ee = new CommandEventArgs(e.Arguments, e.FullCommand); // create the arguments
+                                    ret = c.Callback(this, ee); // Call the command
+                                    e.Continue = !ee.Quit; // Exit if function says so
+                                    return ret; // print the function
+                                }
+                }
+                catch (Exception ee)
+                {
+                    return ee.Message + "\n";
+                }
+            }
+            else
+            {
+                ret = RunEval(this, e); // Run user-defined eval
+                if (e.Parse) // Check if they want us to handle anything
+                    if (HandleHelp && e.Arguments[1] == "help") // Handle help
+                        return ShowHelp(e);
+                    else
+                        foreach (REPLCommand c in commands) // Check which command was called
+                            if ((CaseSensitiveCmd ? e.Arguments[1] : e.Arguments[1].ToLower()) == (CaseSensitiveCmd ? c.Name : c.Name.ToLower())) // If it's the current command
+                            {
+                                CommandEventArgs ee = new CommandEventArgs(e.Arguments, e.FullCommand); // create the arguments
+                                ret = c.Callback(this, ee); // Call the command
+                                e.Continue = !ee.Quit; // Exit if function says so
+                                return ret; // print the function
+                            }
+            }
             return ret; // Return text from RunEval
         }
 

@@ -27,14 +27,16 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading.Tasks;
 
-namespace Console.NET
+namespace InteractiveConsole
 {
-    class Program
+    public class ConsoleEventArgs : EventArgs
     {
-        static void Main(string[] args)
+        public bool Continue { get; set; }
+        public ConsoleEventArgs()
         {
-            InteractiveConsole.Main();
+            Continue = true;
         }
     }
 }

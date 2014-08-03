@@ -23,18 +23,26 @@
  * SOFTWARE.
  */
 #endregion
+using InteractiveConsole;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace Console.NET
 {
-    class Program
+    class InteractiveConsole
     {
-        static void Main(string[] args)
+        public static void Main()
         {
-            InteractiveConsole.Main();
+            InterCon console = new InterCon(InputCallback);
+        }
+
+        private static void InputCallback(InterCon sender, InputEventArgs e)
+        {
+
         }
     }
 }

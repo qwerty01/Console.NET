@@ -25,16 +25,31 @@
 #endregion
 using System;
 using System.Collections.Generic;
+using System.Drawing;
 using System.Linq;
 using System.Text;
+using System.Threading.Tasks;
 
-namespace Console.NET
+namespace InteractiveConsole
 {
-    class Program
+    class MenuItem
     {
-        static void Main(string[] args)
+        public delegate void MenuItemSelectDelegate(MenuItem sender, MenuItemEventArgs e);
+        public ConsoleKeyInfo Hotkey { get; set; }
+        public string Text { get; set; }
+        public bool Enabled { get; set; }
+        public bool HandleInput { get; set; }
+        public event MenuItemSelectDelegate OnSelect;
+
+        internal Point location;
+
+        protected InterCon parent;
+
+        public MenuItem(InterCon parent, string text, ConsoleKeyInfo hotkey = new ConsoleKeyInfo())
         {
-            InteractiveConsole.Main();
+            Hotkey = hotkey;
+            Text = text;
+            Enabled = true;
         }
     }
 }
